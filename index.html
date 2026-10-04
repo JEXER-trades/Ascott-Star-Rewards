@@ -299,6 +299,58 @@
     #cheat dl dd{margin:1pt 0 0 0}
     #cheat .fine{margin-top:14pt;font-size:8pt;color:#777}
   }
+
+  /* ===== phone layout ===== */
+  @media (max-width:760px){
+    header{padding:10px 14px 18px;background:linear-gradient(rgba(7,6,10,.94) 60%,rgba(7,6,10,0));align-items:center}
+    .brand b{font-size:1.02rem;white-space:nowrap}
+    .brand span{display:none}
+    .hud-r{flex-wrap:nowrap;gap:6px}
+    #modeSeg,#snd,#lite,.hud-r .badge,.hud-r a.pill{display:none!important}
+    #tour,#langBtn{padding:7px 10px;font-size:.58rem}
+    .hud.br,.hud.bl,.rail,.scroll-cue{display:none!important}
+    section,section.r,section.c,section.wide,section.globe-sec{align-items:flex-start!important;justify-content:flex-start!important;padding:84px 18px 64px!important;min-height:100svh}
+    section.c{text-align:left}
+    section.c .row,section.c .idx{justify-content:flex-start}
+    section.c p.lead{margin:0}
+    section::before,section.r::before,section.c::before,section.globe-sec::before{background:linear-gradient(rgba(7,6,10,.55),rgba(7,6,10,.72))!important}
+    .idx{letter-spacing:.2em;font-size:.6rem;margin-bottom:14px}
+    h1{font-size:clamp(2.6rem,13vw,4rem)}
+    h2{font-size:clamp(2rem,9.5vw,3rem);margin-bottom:16px}
+    p.lead{font-size:.92rem;line-height:1.7}
+    .row{gap:8px}
+    .big-btn{padding:15px 24px;font-size:.78rem}
+    .tiers .pill,.regions .pill{padding:8px 12px;font-size:.6rem}
+    .tier-card{min-height:0;padding:18px}
+    .tier-card h3{font-size:1.8rem}
+    .glass{padding:18px}
+    .out b{font-size:2rem}.out b.gr{font-size:2.4rem}
+    .out{gap:16px}
+    .facts{grid-template-columns:1fr 1fr;gap:8px}
+    .fact{padding:12px}.fact b{font-size:1.5rem}
+    .globe-wrap{width:min(86vw,380px)!important;margin:0 auto}
+    .wpanel{width:100%}
+    .wstats b{font-size:1.7rem}
+    .cdetail{max-height:none}
+    .personas{gap:8px}
+    .persona{padding:12px 14px;display:flex;gap:12px;align-items:center}
+    .persona .pi{margin:0;flex:0 0 auto}
+    .pdetail{grid-template-columns:1fr 1fr;gap:14px;padding:16px}
+    .pdetail b{font-size:1.6rem}
+    .bizin{grid-template-columns:1fr;gap:14px}
+    .bo.big b{font-size:2.4rem}
+    .joinwrap{grid-template-columns:1fr}
+    .qrcard .qr{width:150px;height:150px}
+    .step{padding:16px}
+    #toast{left:12px;right:12px;bottom:12px;transform:translateY(20px);border-radius:16px;font-size:.74rem;flex-wrap:wrap;padding:12px 14px}
+    #toast.show{transform:none}
+    #tourHint{bottom:10px;font-size:.55rem}
+    .mapcard{padding:8px}
+    footer{padding:30px 18px 50px}
+    html[lang=ja] h1,html[lang=zh] h1{font-size:clamp(2rem,9.6vw,3.2rem)}
+    .sp .w{padding-bottom:.14em}
+    h2{line-height:1.02}
+  }
 </style>
 </head>
 <body>
@@ -1372,7 +1424,8 @@ if(prog){
   const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
   ['uRes','uTime','uMouse','uScroll','uClick','uC1','uC2','uC3','uEnergy','uSpeed','uTravel'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
 }
-let lite=reduceMotion, scale=isTouch?.4:.55;
+const isSmall=matchMedia('(max-width:760px)').matches;
+let lite=reduceMotion||isSmall, scale=isTouch?.4:.55;
 const maxScale=()=>lite?.32:(isTouch?.55:.75), minScale=()=>lite?.22:.25;
 function resize(){if(lite)scale=Math.min(scale,maxScale());canvas.width=Math.max(2,Math.floor(innerWidth*scale));canvas.height=Math.max(2,Math.floor(innerHeight*scale));if(prog)gl.viewport(0,0,canvas.width,canvas.height);$('#hRes').textContent=canvas.width+'×'+canvas.height;}
 addEventListener('resize',resize);
@@ -1642,6 +1695,7 @@ for(const k in MORE){L[k]=MORE[k].L;TIERS_I18N[k]=MORE[k].tiers;WX[k]=MORE[k].wx
 const hashArgs=(location.hash+location.search).toLowerCase();
 buildRail();
 if(hashArgs.includes('lobby'))setMode('lobby');
+if((isTouch||isSmall)&&mode!=='lobby'&&tourOn)toggleTour();
 if(lite)setLite(true);else resize();
 if(hashArgs.includes('lite'))setLite(true);
 const hl=(hashArgs.match(/(?:^|[#?&\-_=,])(en|de|fr|es|zh|ja|ar)(?=$|[&\-_,])/)||[])[1];
