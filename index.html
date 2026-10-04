@@ -372,7 +372,6 @@
   <div class="brand"><b>Ascott Star Rewards</b><span>CITADINES KURFÜRSTENDAMM · BERLIN</span></div>
   <div class="hud-r">
     <span class="badge hide-l" data-i18n="badge">INTERNAL CONCEPT</span>
-    <div class="seg hide-m" id="modeSeg" title="Pitch shows the business case; Lobby is the guest-facing loop"><button data-mode="pitch" class="on">PITCH</button><button data-mode="lobby">LOBBY</button></div>
     <div class="lsel" id="langSel"><button class="pill sm mag" id="langBtn" aria-haspopup="true">🌐 EN ▾</button><div class="lmenu" id="langMenu" role="menu"><button data-lang="en">English<small>EN</small></button><button data-lang="de">Deutsch<small>DE</small></button><button data-lang="fr">Français<small>FR</small></button><button data-lang="es">Español<small>ES</small></button><button data-lang="zh">简体中文<small>ZH</small></button><button data-lang="ja">日本語<small>JA</small></button><button data-lang="ar">العربية<small>AR</small></button></div></div>
     <button class="pill sm mag hide-m" id="lite" title="Lite mode (L)">◐ LITE</button>
     <button class="pill sm mag on" id="tour" title="Auto tour (T)">❚❚ AUTO TOUR</button>
@@ -493,30 +492,6 @@
         </svg>
         <p class="note" data-i18n="w3.mapnote">Schematic map, not to scale. Distances and walking times are approximate.</p>
       </div>
-    </div>
-  </section>
-
-  <section id="wb" class="pitch-only" data-name="BUSINESS CASE">
-    <div class="blk wideblk">
-      <div class="idx fd" data-i18n="wb.idx">THE BUSINESS CASE · FOR MANAGEMENT</div>
-      <h2 class="sp" data-i18n="wb.h2">Why direct members <span class="gr it">matter to us.</span></h2>
-      <div class="biz fd">
-        <div class="glass bizin">
-          <div class="field"><label><span data-i18n="wb.l1">OCCUPANCY</span> <b id="bOccO">80%</b></label><input type="range" id="bOcc" min="50" max="95" value="80" class="mag"></div>
-          <div class="field"><label><span data-i18n="wb.l2">AVERAGE DAILY RATE</span> <b id="bAdrO">€140</b></label><input type="range" id="bAdr" min="80" max="250" step="5" value="140" class="mag"></div>
-          <div class="field"><label><span data-i18n="wb.l3">SHARE BOOKED VIA OTAs</span> <b id="bOtaO">45%</b></label><input type="range" id="bOta" min="10" max="80" value="45" class="mag"></div>
-          <div class="field"><label><span data-i18n="wb.l4">OTA COMMISSION</span> <b id="bComO">18%</b></label><input type="range" id="bCom" min="10" max="25" value="18" class="mag"></div>
-          <div class="field"><label><span data-i18n="wb.l5">MEMBER RATE DISCOUNT</span> <b id="bDisO">5%</b></label><input type="range" id="bDis" min="0" max="15" value="5" class="mag"></div>
-          <div class="field"><label><span data-i18n="wb.l6">BOOKINGS SHIFTED TO DIRECT</span> <b id="bShiftO">10 pts</b></label><input type="range" id="bShift" min="0" max="30" value="10" class="mag"></div>
-        </div>
-        <div class="glass bizout">
-          <div class="bo"><span data-i18n="wb.o1">ROOM NIGHTS / YEAR</span><b id="bNights">0</b></div>
-          <div class="bo"><span data-i18n="wb.o2">OTA COMMISSION TODAY / YEAR</span><b id="bComm">€0</b></div>
-          <div class="bo big"><span data-i18n="wb.o3">NET SAVING / YEAR FROM THE SHIFT</span><b class="gr" id="bSave">€0</b></div>
-          <div class="bars"><div class="bar"><i id="barNow"></i><em data-i18n="wb.bar1">Commission today</em></div><div class="bar"><i id="barAfter"></i><em data-i18n="wb.bar2">After the shift</em></div></div>
-        </div>
-      </div>
-      <p class="note fd" data-i18n="wb.note">Placeholder figures for discussion: replace them with the hotel's real numbers. Only the 117 apartments is an actual figure. Saving = shifted room nights × rate × (OTA commission − member discount). Programme fees and other costs are not included.</p>
     </div>
   </section>
 
@@ -1332,6 +1307,7 @@ function renderPersonas(){
    ========================================================= */
 const ROOMS=117;
 function biz(){
+  if(!$('#bOcc'))return;
   const occ=+$('#bOcc').value/100, adr=+$('#bAdr').value, ota=+$('#bOta').value/100, com=+$('#bCom').value/100, dis=+$('#bDis').value/100, sh=Math.min(+$('#bShift').value/100,ota);
   const nights=ROOMS*365*occ, commNow=nights*adr*ota*com, save=nights*sh*adr*Math.max(0,com-dis), commAfter=nights*adr*(ota-sh)*com;
   $('#bOccO').textContent=Math.round(occ*100)+'%';$('#bAdrO').textContent=eur(adr);$('#bOtaO').textContent=Math.round(ota*100)+'%';
@@ -1339,7 +1315,7 @@ function biz(){
   $('#bNights').textContent=fmt(nights);$('#bComm').textContent=eur(commNow);$('#bSave').textContent=eur(save);
   $('#barNow').style.width='100%';$('#barAfter').style.width=(commNow?Math.max(2,commAfter/commNow*100):0)+'%';
 }
-['bOcc','bAdr','bOta','bCom','bDis','bShift'].forEach(id=>$('#'+id).addEventListener('input',biz));
+['bOcc','bAdr','bOta','bCom','bDis','bShift'].forEach(id=>{const el=$('#'+id);if(el)el.addEventListener('input',biz);});
 
 /* =========================================================
    CURSOR + MAGNETIC
@@ -1694,8 +1670,8 @@ window.__globeReady=true;
 for(const k in MORE){L[k]=MORE[k].L;TIERS_I18N[k]=MORE[k].tiers;WX[k]=MORE[k].wx;COUNTRY_I18N[k]=MORE[k].countries;CHEAT[k]=MORE[k].cheat;MORE[k].personas.forEach((p,i)=>PERSONAS[i][k]=p);}
 const hashArgs=(location.hash+location.search).toLowerCase();
 buildRail();
-if(hashArgs.includes('lobby'))setMode('lobby');
-if((isTouch||isSmall)&&mode!=='lobby'&&tourOn)toggleTour();
+setMode('lobby');
+if((isTouch||isSmall)&&!hashArgs.includes('lobby')&&tourOn)toggleTour();
 if(lite)setLite(true);else resize();
 if(hashArgs.includes('lite'))setLite(true);
 const hl=(hashArgs.match(/(?:^|[#?&\-_=,])(en|de|fr|es|zh|ja|ar)(?=$|[&\-_,])/)||[])[1];
